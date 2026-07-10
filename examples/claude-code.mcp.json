@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "crawldex": {
+      "command": "npx",
+      "args": ["-y", "crawldex-mcp"],
+      "env": {
+        "CRAWLDEX_API_ORIGIN": "https://crawldex.com",
+        "CRAWLDEX_CHANNEL": "pack-claude-code"
+      }
+    }
+  }
+}

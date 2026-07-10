@@ -1,0 +1,50 @@
+{
+  "name": "crawldex-mcp",
+  "version": "0.3.0",
+  "description": "Read-only CrawlDex MCP stdio server for public website task preflight.",
+  "type": "module",
+  "bin": {
+    "crawldex-mcp": "dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "prepack": "npm run build",
+    "pack:dry-run": "npm pack --dry-run"
+  },
+  "keywords": [
+    "crawldex",
+    "mcp",
+    "preflight",
+    "web-agents",
+    "browser-agents"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.8"
+  }
+}
