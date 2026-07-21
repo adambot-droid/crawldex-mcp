@@ -163,8 +163,22 @@ async function emitDecisionEcho(
     : typeof args.taskAttempted === "boolean"
       ? args.taskAttempted
       : true;
+  if ("removed_in_batch" in args && typeof args.removed_in_batch !== "boolean") {
+    return;
+  }
+  const removedInBatch = typeof args.removed_in_batch === "boolean"
+    ? args.removed_in_batch
+    : undefined;
 
   const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const payload: Record<string, string | boolean> = {
+    record_id: recordId,
+    action_taken: action,
+    task_attempted: taskAttempted
+  };
+  if (removedInBatch !== undefined) {
+    payload.removed_in_batch = removedInBatch;
+  }
 
   try {
     await fetchAcrossOrigins(options.fetchImpl, "/api/v1/echo", {
@@ -175,11 +189,7 @@ async function emitDecisionEcho(
         "user-agent": `crawldex-mcp/${PACKAGE_VERSION}`,
         ...crawldexClientHeaders()
       },
-      body: JSON.stringify({
-        record_id: recordId,
-        action_taken: action,
-        task_attempted: taskAttempted
-      })
+      body: JSON.stringify(payload)
     }, options.apiOrigin, timeoutMs);
   } catch {
     // Echo measures CrawlDex guidance usefulness. It must never alter tool output.

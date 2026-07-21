@@ -25,7 +25,8 @@ export const CRAWLDEX_TOOLS: Tool[] = [
         site: { type: "string" },
         origin: { type: "string" },
         task: { type: "string" },
-        agent_profile: { type: ["object", "string"] }
+        agent_profile: { type: ["object", "string"] },
+        removed_in_batch: { type: "boolean" }
       },
       additionalProperties: true
     }
@@ -76,7 +77,8 @@ export const CRAWLDEX_TOOLS: Tool[] = [
         site: { type: "string" },
         origin: { type: "string" },
         task: { type: "string" },
-        agent_profile: { type: ["object", "string"] }
+        agent_profile: { type: ["object", "string"] },
+        removed_in_batch: { type: "boolean" }
       },
       additionalProperties: true
     }

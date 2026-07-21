@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Source pending guard
+        run: |
+          if [ -f SOURCE-PENDING.md ]; then
+            echo "packages/crawldex-mcp source has not landed in the canonical monorepo yet."
+            exit 1
+          fi
+      - run: npm install
+      - run: npm run build
+      - run: npm test

@@ -40,6 +40,13 @@ describe("crawldex-mcp stdio server", () => {
       expect(list.tools.map((tool) => tool.name)).toContain("get_trust_record");
       expect(list.tools.find((tool) => tool.name === "get_trust_record")?.description)
         .toMatch(/^Call BEFORE an agent attempts any public-website task/);
+      for (const toolName of ["preflight", "check_site_task"]) {
+        const schema = list.tools.find((tool) => tool.name === toolName)?.inputSchema;
+        expect(schema?.properties).toMatchObject({
+          removed_in_batch: { type: "boolean" }
+        });
+        expect(schema?.required ?? []).not.toContain("removed_in_batch");
+      }
       expect(list.tools.map((tool) => tool.name)).not.toContain("report_outcome");
       expect(list.tools.map((tool) => tool.name)).not.toContain("submit_observation");
     } finally {
@@ -243,7 +250,8 @@ describe("crawldex-mcp stdio server", () => {
           task: "subscriptions.cancel",
           record_id: "atr_0123456789abcdef",
           echo_action: "partial",
-          task_attempted: true
+          task_attempted: false,
+          removed_in_batch: true
         }
       }) as CallToolResult;
 
@@ -259,8 +267,38 @@ describe("crawldex-mcp stdio server", () => {
       expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toEqual({
         record_id: "atr_0123456789abcdef",
         action_taken: "partial",
-        task_attempted: true
+        task_attempted: false,
+        removed_in_batch: true
       });
+    } finally {
+      await harness.close();
+    }
+  });
+
+  it("skips a decision echo when removed_in_batch is not boolean", async () => {
+    const fetchMock = vi.fn(async () => jsonResponse({
+      jsonrpc: "2.0",
+      id: 1,
+      result: {
+        content: [{ type: "text", text: "ok" }],
+        structuredContent: { ok: true }
+      }
+    }));
+    const harness = await createHarness(fetchMock);
+
+    try {
+      const result = await harness.client.callTool({
+        name: "preflight",
+        arguments: {
+          site: "netflix.com",
+          task: "subscriptions.cancel",
+          record_id: "atr_0123456789abcdef",
+          removed_in_batch: "removed because of private details"
+        }
+      }) as CallToolResult;
+
+      expect(result.isError).not.toBe(true);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
     } finally {
       await harness.close();
     }

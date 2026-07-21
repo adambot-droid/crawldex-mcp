@@ -1,6 +1,7 @@
 {
   "name": "crawldex-mcp",
   "version": "0.3.0",
+  "mcpName": "io.github.crawldex/crawldex-mcp",
   "description": "Read-only CrawlDex MCP stdio server for public website task preflight.",
   "type": "module",
   "bin": {
